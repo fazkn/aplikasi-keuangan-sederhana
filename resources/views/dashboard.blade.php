@@ -1,5 +1,7 @@
 @extends('layout')
 
+@section('title','Dashboard')
+
 @section('content')
 <h3 class="mb-4">Dashboard Keuangan</h3>
 <div class="alert alert-info">
@@ -12,7 +14,7 @@
                 <div class="card text-white bg-success mb-3">
                     <div class="card-header">Total Pemasukan</div>
                     <div class="card-body">
-                        <h5 class="card-title">Rp {{ number_format($pemasukan, 0, ',', '.') }}</h5>
+                        <h5 class="card-title">{{Format::rupiah($pemasukan) }}</h5>
                     </div>
                 </div>
             </div>
@@ -20,7 +22,7 @@
                 <div class="card text-white bg-danger mb-3">
                     <div class="card-header">Total Pengeluaran</div>
                     <div class="card-body">
-                        <h5 class="card-title">Rp {{ number_format($pengeluaran, 0, ',', '.') }}</h5>
+                        <h5 class="card-title">{{Format::rupiah($pengeluaran) }}</h5>
                     </div>
                 </div>
             </div>
@@ -28,7 +30,7 @@
                 <div class="card text-white bg-primary mb-3">
                     <div class="card-header">Saldo Saat Ini</div>
                     <div class="card-body">
-                        <h5 class="card-title">Rp {{ number_format($saldo, 0, ',', '.') }}</h5>
+                        <h5 class="card-title">{{Format::rupiah($saldo) }}</h5>
                     </div>
                 </div>
             </div>
@@ -44,6 +46,9 @@
             </div>
         </div>
     </div>
+    @if(count($pengeluaranPerKategori) === 0)
+        <p class="text-center text-muted">Belum ada data pengeluaran per kategori.</p>
+    @endif
 </div>
 @endsection
 

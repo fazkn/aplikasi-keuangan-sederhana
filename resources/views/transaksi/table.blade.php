@@ -10,9 +10,9 @@
     </tr>
   </thead>
   <tbody>
-    @foreach ($transaksi as $t)
-    <tr>
-        <td>{{ $t->tanggal }}</td>
+    @forelse ($transaksi as $t)
+    <tr class="{{ $t->tipe === 'pemasukan' ? 'table-success' : 'table-danger' }}">
+        <td>{{ Format::tanggalDanWaktu($t->tanggal) }}</td>
         <td>{{ ucfirst($t->tipe) }}</td>
         <td>{{ $t->kategori }}</td>
         <td>{{ $t->deskripsi }}</td>
@@ -24,6 +24,10 @@
         </form>
       </td>
     </tr>
-    @endforeach
+    @empty
+        <tr>
+            <td colspan="6" class="text-center">Belum ada data transaksi.</td>
+        </tr>
+    @endforelse
   </tbody>
 </table>

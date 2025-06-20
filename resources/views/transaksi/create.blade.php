@@ -39,10 +39,10 @@
     </div>
     <div class="mb-3">
         <label>Deskripsi</label>
-        <input type="text" name="deskripsi" class="form-control" value="{{old('deskripsi')}}" required>
+        <input type="text" name="deskripsi" class="form-control" placeholder="Contoh: Gaji bulan Juni" value="{{old('deskripsi')}}" required>
     </div>
     <div class="mb-3">
-        <label>Jumlah (Rp)</label>
+        <label>Jumlah <small class="text-muted">(dalam Rupiah)</small></label>
         <input type="number" name="jumlah" class="form-control" value="{{old('jumlah')}}" required>
     </div>
     <button class="btn btn-success">Simpan</button>

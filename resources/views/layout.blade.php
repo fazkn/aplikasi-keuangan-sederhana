@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang='id'>
+<html lang="{{str_replace('_', '-', app()->getLocale())}}">
 <head>
+  @stack('styles')
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Budget Harian</title>
+    <title>@yield('title', 'Budget Harian')</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 </head>
 
@@ -46,5 +47,10 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 @yield('scripts')
+
+<footer class="text-center py-4 mt-5 border-top text-muted small">
+    &copy; {{ date('Y') }} Budget Harian. All rights reserved.
+</footer>
+@stack('scripts')
 </body>
 </html>
