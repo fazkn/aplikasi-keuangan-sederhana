@@ -10,5 +10,11 @@ class Transaksi extends Model
     protected $table = 'transaksi';
 
     // Field yang diizinkan untuk mass assignment
-    protected $fillable = ['tanggal', 'tipe', 'kategori', 'deskripsi', 'jumlah'];
+    protected $fillable = ['tanggal', 'tipe', 'kategori_id', 'deskripsi', 'jumlah'];
+
+    public function kategori()
+        {
+            return $this->belongsTo(Kategori::class);
+        }
+
 }

@@ -3,44 +3,66 @@
 @section('content')
 <a href="{{ route('transaksi.create') }}" class="btn btn-primary mb-3">+ Tambah Transaksi</a>
 
-<div class="table-responsive">
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Tanggal</th>
-                <th>Jenis</th>
-                <th>Kategori</th>
-                <th>Deskripsi</th>
-                <th>Jumlah</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($transaksi as $t)
-            <tr class="{{ $t->tipe === 'pemasukan' ? 'table-success' : 'table-danger' }}">
-                <td>{{ Format::tanggalDanWaktu($t->tanggal) }}</td>
-                <td>{{ ucfirst($t->tipe) }}</td>
-                <td><span class="badge bg-secondary">{{ $t->kategori }}</span></td>
-                <td>{{ $t->deskripsi }}</td>
-                <td>{{ Format::rupiah($t->jumlah) }}</td>
-                <td>
-                    <form action="{{ route('transaksi.destroy', $t->id) }}" method="POST">
-                        @csrf @method('DELETE')
-                        <button onclick="return confirm('Yakin?')" class="btn btn-sm btn-danger">Hapus</button>
-                    </form>
-                </td>
-            </tr>
-            @empty
-            <tr>
-                <td colspan="6" class="text-center">Belum ada data transaksi.</td>
-            </tr>
-            @endforelse
-        </tbody>
-    </table>
-    <div class="mt-3">
-    {{ $transaksi->links() }}
-    </div>
+@php
+    $carbon = \Carbon\Carbon::parse($bulan . '-01');
+    $prevBulan = $carbon->copy()->subMonth()->format('Y-m');
+    $nextBulan =$carbon->copy()->addMonth()->format('Y-m');
+@endphp
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <a href="{{route('transaksi.index', ['bulan' => $prevBulan]) }}" class="btn btn-outline-secondary">
+        &laquo; {{$carbon->copy()->subMonth()->translatedFormat('F Y') }}
+    </a>
+
+    <h5 class="mb-0">{{ $carbon->translatedFormat('F Y') }}</h5>
+
+    <a href="{{ route('transaksi.index', ['bulan' => $nextBulan]) }}" class="btn btn-outline-secondary">
+        {{ $carbon->copy()->addMonth()->translatedFormat('F Y') }} &raquo;
+    </a>
 </div>
+
+@php
+$grouped = $transaksi->groupBy(function($item)
+{
+    return \App\Facades\Format::tanggalIndo($item->tanggal, true);
+});
+@endphp
+
+@forelse ($grouped as $tanggal => $list)
+    <div class="mb-4">
+        <h5 class="fw-bold text-primary border-bottom pb-2">{{$tanggal}}</h5>
+    
+    @foreach ($list as $t)
+    <div class="card mb-3 shadow-sm {{ $t->tipe === 'pemasukan' ? 'border-success' : 'border-danger' }}">
+        <div class="card-body">
+            <div class="d-flex justify-content-between flex-column flex-md-row">
+                <div class="mb-2 mb-md-0">
+                    <h5 class="mb-1">{{ $t->deskripsi }}</h5>
+                    <div class="text-muted small">
+                        {{ \App\Facades\Format::tanggalIndo($t->tanggal, true) }}
+                        {{ ucfirst($t->tipe) }} • {{ $t->kategori->nama_kategori ?? '-'}}
+                    </div>
+                </div>
+                <div class="text-end">
+                    <h5 class="{{ $t->tipe === 'pemasukan' ? 'text-success' : 'text-danger' }}">
+                        {{ Format::rupiah($t->jumlah) }}
+                    </h5>
+                </div>
+            </div>
+            <div class="mt-2 d-flex gap-2">
+                <a href="{{ route('transaksi.edit', $t->id) }}" class="btn btn-sm btn-outline-warning">Edit</a>
+                <form action="{{ route('transaksi.destroy', $t->id) }}" method="POST" onsubmit="return confirm('Hapus transaksi ini?')">
+                    @csrf @method('DELETE')
+                    <button class="btn btn-sm btn-outline-danger">Hapus</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endforeach
+</div>
+@empty
+    <div class="alert alert-info text-center">Belum ada transaksi untuk bulan ini.</div>    
+@endempty
 
 <hr>
 <h5>Total Pemasukan: {{ Format::rupiah($totalPemasukan) }}</h5>

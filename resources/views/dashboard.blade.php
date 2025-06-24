@@ -56,7 +56,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
   const kategoriData = @json($pengeluaranPerKategori);
-  const labels = kategoriData.map(item => item.kategori);
+  const labels = kategoriData.map(item => item.nama_kategori);
   const data = kategoriData.map(item => item.total);
 
   const ctx = document.getElementById('kategoriChart').getContext('2d');

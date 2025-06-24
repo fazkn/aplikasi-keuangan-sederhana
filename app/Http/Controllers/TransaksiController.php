@@ -3,77 +3,78 @@
 namespace App\Http\Controllers;
 
 use App\Models\Transaksi;
+use App\Models\Kategori;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class TransaksiController extends Controller
 {
-    public function index()
-    {
-        $transaksi = Transaksi::orderBy('tanggal', 'desc')->paginate(10);
-        $totalPemasukan = Transaksi::where('tipe', 'pemasukan')->sum('jumlah');
-        $totalPengeluaran = Transaksi::where('tipe', 'pengeluaran')->sum('jumlah');
-        $saldo = $totalPemasukan - $totalPengeluaran;
+    public function index(Request $request)
+{
+    $bulan = $request->get('bulan') ?? now()->format('Y-m');
 
-        return view('transaksi.index', compact('transaksi', 'totalPemasukan', 'totalPengeluaran', 'saldo'));
-    }
+    $transaksi = Transaksi::whereYear('tanggal', substr($bulan, 0, 4))
+        ->whereMonth('tanggal', substr($bulan, 5, 2))
+        ->orderBy('tanggal', 'desc')
+        ->get();
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    $totalPemasukan = $transaksi->where('tipe', 'pemasukan')->sum('jumlah');
+    $totalPengeluaran = $transaksi->where('tipe', 'pengeluaran')->sum('jumlah');
+    $saldo = $totalPemasukan - $totalPengeluaran;
+
+    return view('transaksi.index', compact('transaksi', 'totalPemasukan', 'totalPengeluaran', 'saldo', 'bulan'));
+}
+
     public function create()
     {
-       return view('transaksi.create');
+        $pemasukanKategori = Kategori::where('tipe', 'pemasukan')->get();
+        $pengeluaranKategori = Kategori::where('tipe', 'pengeluaran')->get();
+        return view('transaksi.create', compact('pemasukanKategori', 'pengeluaranKategori'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
             'tanggal' => 'required|date',
             'tipe' => 'required|in:pemasukan,pengeluaran',
-            'kategori' => 'required|string',
+            'kategori_id' => 'required|exists:kategori,id',
             'deskripsi' => 'required|string',
             'jumlah' => 'required|numeric|min:0',
         ]);
 
-        Transaksi::create($request->only(['tanggal','tipe','kategori','deskripsi','jumlah']));
+        Transaksi::create($request->only(['tanggal', 'tipe', 'kategori_id', 'deskripsi', 'jumlah']));
         return redirect()->route('transaksi.index');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
-        //
+        // Belum digunakan
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
-        //
+        $pemasukanKategori = Kategori::where('tipe', 'pemasukan')->get();
+        $pengeluaranKategori = Kategori::where('tipe', 'pengeluaran')->get();
+        return view('transaksi.edit', compact('transaksi', 'pemasukanKategori', 'pengeluaranKategori'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'tanggal' => 'required|date',
+            'tipe' => 'required|in:pemasukan,pengeluaran',
+            'kategori_id' => 'required|exists:kategori,id',
+            'deskripsi' => 'required|string',
+            'jumlah' => 'required|numeric|min:0',
+        ]);
+
+        $transaksi = Transaksi::findOrFail($id);
+        $transaksi->update($request->only(['tanggal','tipe','kategori_id','deskripsi','jumlah']));
+        return redirect()->route('transaksi.index')->with('success', 'Transaksi berhasil diperbarui');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Transaksi $transaksi)
     {
         $transaksi->delete();
         return redirect()->route('transaksi.index');
     }
-
 }
