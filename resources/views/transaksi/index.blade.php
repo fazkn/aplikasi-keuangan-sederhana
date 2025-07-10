@@ -1,13 +1,21 @@
 @extends('layout')
 
+@php
+use App\Facades\Format;
+use Carbon\Carbon;
+
+$carbon = Carbon::parse($bulan . '-01');
+$grouped = $transaksi->groupBy(function($item)
+{
+    return Format::tanggalIndo($item->tanggal, true);
+});
+
+$prevBulan = $carbon->copy()->subMonth()->format('Y-m');
+$nextBulan = $carbon->copy()->addMonth()->format('Y-m');
+@endphp
+
 @section('content')
 <a href="{{ route('transaksi.create') }}" class="btn btn-primary mb-3">+ Tambah Transaksi</a>
-
-@php
-    $carbon = \Carbon\Carbon::parse($bulan . '-01');
-    $prevBulan = $carbon->copy()->subMonth()->format('Y-m');
-    $nextBulan =$carbon->copy()->addMonth()->format('Y-m');
-@endphp
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <a href="{{route('transaksi.index', ['bulan' => $prevBulan]) }}" class="btn btn-outline-secondary">
@@ -21,13 +29,6 @@
     </a>
 </div>
 
-@php
-$grouped = $transaksi->groupBy(function($item)
-{
-    return \App\Facades\Format::tanggalIndo($item->tanggal, true);
-});
-@endphp
-
 @forelse ($grouped as $tanggal => $list)
     <div class="mb-4">
         <h5 class="fw-bold text-primary border-bottom pb-2">{{$tanggal}}</h5>
@@ -39,7 +40,7 @@ $grouped = $transaksi->groupBy(function($item)
                 <div class="mb-2 mb-md-0">
                     <h5 class="mb-1">{{ $t->deskripsi }}</h5>
                     <div class="text-muted small">
-                        {{ \App\Facades\Format::tanggalIndo($t->tanggal, true) }}
+                        {{ Format::tanggalIndo($t->tanggal, true) }}
                         {{ ucfirst($t->tipe) }} • {{ $t->kategori->nama_kategori ?? '-'}}
                     </div>
                 </div>

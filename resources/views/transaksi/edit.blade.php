@@ -20,7 +20,7 @@
         <label>Tanggal</label>
         <input type="date" name="tanggal" class="form-control" value="{{old('tanggal', $transaksi->tanggal)}}" required>
     </div>
-     <div class="mb-3">
+    <div class="mb-3">
         <label>Jenis Transaksi</label>
         <select name="tipe" class="form-control" required>
             <option value="pemasukan" {{ old('tipe', $transaksi->tipe) == 'pemasukan' ? 'selected' : '' }}>Pemasukan</option>
@@ -31,13 +31,28 @@
         <label>Kategori</label>
         <select name="kategori_id" id="kategori_id" class="form-control" required>
             <option value="">-- Pilih Kategori --</option>
-            @foreach ($pemasukanKategori as $k)
-                <option value="{{ $k->id }}" data-tipe="pemasukan"> {{ $k->nama_kategori}}</option>
-            @endforeach
-            @foreach ($pengeluaranKategori as $k)
-                <option value="{{ $k->id }}" data-tipe="pengeluaran"> {{ $k->nama_kategori}}</option>
-            @endforeach
+
+            @if ($pemasukanKategori->isEmpty())
+                <option value="" disabled>Belum ada kategori Pemasukan</option>
+            @else
+                @foreach ($pemasukanKategori as $k)
+                    <option value="{{ $k->id }}" data-tipe="pemasukan"
+                        {{ old('kategori_id', $transaksi->kategori_id) == $k->id ? 'selected' : '' }}>
+                        {{ $k->nama_kategori}}</option>
+                @endforeach
+            @endif
+
+            @if ($pengeluaranKategori->isEmpty())
+                <option value="" disabled>Belum ada kategori Pengeluaran</option>
+            @else
+                @foreach ($pengeluaranKategori as $k)
+                    <option value="{{ $k->id }}" data-tipe="pengeluaran"
+                        {{ old('kategori_id', $transaksi->kategori_id) == $k->id ? 'selected' : '' }}>
+                        {{ $k->nama_kategori}}</option>
+                @endforeach
+            @endif
         </select>
+
     </div>
     <div class="mb-3">
         <label>Deskripsi</label>
@@ -66,7 +81,7 @@
             });
 
             if (kategoriSelect.selectedOptions.length &&
-                kategoriSelect.selectedOptions[0].hidden) {
+                kategoriSelect.selectedOptions[0].style.display === 'none') {
                 kategoriSelect.value = "";
             }
         }

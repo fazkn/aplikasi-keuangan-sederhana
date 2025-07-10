@@ -6,7 +6,31 @@
 <h3 class="mb-4">Dashboard Keuangan</h3>
 <div class="alert alert-info">
     Selamat datang di Dashboard Keuangan! Di sini Anda dapat melihat ringkasan pemasukan, pengeluaran, dan saldo Anda.</div>
-<div class="row">
+
+<form method="GET" class="row g-2 mb-3">
+    <div class = "col-auto">
+        <select name="bulan" class="form-select">
+            @for($i = 1; $i <= 12; $i++)
+                <option value="{{ sprintf('%02d', $i) }}" {{$bulan == sprintf('%02d', $i) ? 'selected' : ''}}>
+                    {{ DateTime::createFromFormat('!m', $i)->format('F') }}
+                </option>
+            @endfor
+        </select>
+    </div>
+
+    <div class="col-auto">
+        <select name="tahun" class="form-select">
+            @for($i = now()->year - 10; $i <= now()->year + 15; $i++)
+                <option value="{{ $i }}" {{ $tahun == $i ? 'selected' : '' }}>{{ $i }}</option>
+            @endfor
+        </select>
+    </div>
+
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </div>
+
+    <div class="row">
     <!-- Kolom Kiri: Ringkasan Keuangan -->
     <div class="col-md-8">
         <div class="row text-center">

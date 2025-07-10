@@ -52,6 +52,7 @@ class TransaksiController extends Controller
 
     public function edit(string $id)
     {
+        $transaksi = Transaksi::findOrFail($id);
         $pemasukanKategori = Kategori::where('tipe', 'pemasukan')->get();
         $pengeluaranKategori = Kategori::where('tipe', 'pengeluaran')->get();
         return view('transaksi.edit', compact('transaksi', 'pemasukanKategori', 'pengeluaranKategori'));

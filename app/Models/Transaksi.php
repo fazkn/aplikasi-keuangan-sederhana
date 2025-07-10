@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Transaksi extends Model
 {
+    use HasFactory;
+
     // Nama tabel yang digunakan model ini
     protected $table = 'transaksi';
 

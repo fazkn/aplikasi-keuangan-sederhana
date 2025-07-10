@@ -8,20 +8,31 @@ use App\Models\Transaksi;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $pemasukan = Transaksi::where('tipe', 'pemasukan')->sum('jumlah');
-        $pengeluaran = Transaksi::where('tipe', 'pengeluaran')->sum('jumlah');
+        $bulan = $request->input('bulan', now()->format('m'));
+        $tahun = $request->input('tahun', now()->format('Y'));
+
+        $summary = Transaksi::whereYear('tanggal', $tahun)
+            ->whereMonth('tanggal', $bulan)
+            ->selectRaw("
+                SUM(CASE WHEN tipe = 'pemasukan' THEN jumlah ELSE 0 END) as pemasukan,
+                SUM(CASE WHEN tipe = 'pengeluaran' THEN jumlah ELSE 0 END) as pengeluaran")
+            ->first();
+
+        $pemasukan = $summary->pemasukan ?? 0;
+        $pengeluaran = $summary->pengeluaran ?? 0; 
         $saldo = $pemasukan - $pengeluaran;
 
-        $pengeluaranPerKategori = DB::table('transaksi')
+        $pengeluaranPerKategori = Transaksi::whereYear('tanggal', $tahun)
+            ->whereMonth('tanggal', $bulan)
+            ->where('transaksi.tipe', 'pengeluaran')
             ->join('kategori', 'transaksi.kategori_id', '=', 'kategori.id')
             ->select('kategori.nama_kategori', DB::raw('SUM(transaksi.jumlah) as total'))
-            ->where('transaksi.tipe', 'pengeluaran')
             ->groupBy('kategori.nama_kategori')
             ->get();
 
-        return view('dashboard', compact('pemasukan', 'pengeluaran', 'saldo', 'pengeluaranPerKategori'));
+        return view('dashboard', compact('pemasukan', 'pengeluaran', 'saldo', 'pengeluaranPerKategori', 'bulan', 'tahun'));
     }
 }
 

@@ -34,12 +34,21 @@
         <label>Kategori</label>
         <select name="kategori_id" id="kategori_id" class="form-control" required>
             <option value="">-- Pilih Kategori --</option>
-            @foreach ($pemasukanKategori as $k)
-                <option value="{{ $k->id }}" data-tipe="pemasukan"> {{ $k->nama_kategori}}</option>
-            @endforeach
-            @foreach ($pengeluaranKategori as $k)
-                <option value="{{ $k->id }}" data-tipe="pengeluaran"> {{ $k->nama_kategori}}</option>
-            @endforeach
+
+            @if ($pemasukanKategori->isEmpty())
+                <option value="" disabled>Belum ada kategori Pemasukan</option>
+            @else
+                @foreach ($pemasukanKategori as $k)
+                    <option value="{{ $k->id }}" data-tipe="pemasukan"> {{ $k->nama_kategori}}</option>
+                @endforeach
+            @endif
+            @if ($pengeluaranKategori->isEmpty())
+                <option value="" disabled>Belum ada kategori Pengeluaran</option>
+            @else
+                @foreach ($pengeluaranKategori as $k)
+                    <option value="{{ $k->id }}" data-tipe="pengeluaran"> {{ $k->nama_kategori}}</option>
+                @endforeach
+            @endif
         </select>
 
     </div>
@@ -51,7 +60,8 @@
         <label>Jumlah <small class="text-muted">(dalam Rupiah)</small></label>
         <input type="number" name="jumlah" class="form-control" value="{{old('jumlah')}}" required>
     </div>
-    <button class="btn btn-success">Simpan</button>
+    <button class="btn btn-success">
+        <i class= "bi bi-save"></i>Simpan Transaksi</button>
 </form>
 @endsection
 

@@ -23,9 +23,12 @@ return new class extends Migration
      * Reverse the migrations.
      */
     public function down(): void
-    {
-        Schema::table('transaksi', function (Blueprint $table) {
-            //
-        });
-    }
+{
+    Schema::table('transaksi', function (Blueprint $table) {
+        $table->dropForeign(['kategori_id']);
+        $table->dropColumn('kategori_id');
+        $table->string('kategori');
+    });
+}
+
 };
